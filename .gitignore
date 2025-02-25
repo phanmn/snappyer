@@ -2,7 +2,7 @@ env.mk
 *.o
 ebin/
 *.d
-*.so
+# *.so
 *.beam
 .rebar
 .deps
