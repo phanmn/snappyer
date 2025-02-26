@@ -1,0 +1,28 @@
+%% This is for cross-compilation, so we hardcode the target
+%% Determine target OS - use environment variable or default based on os:type()
+TargetOS = case os:type() of
+            {unix, darwin} -> "macos";
+            {unix, linux} -> "linux";
+            {win32, _} -> "windows";
+            _ -> "unknown"
+        end,
+
+%% Determine target architecture - use environment variable or detect
+TargetArch = case os:type() of
+            {unix, darwin} -> "arm64";
+            {unix, linux} -> "amd64";
+            {win32, _} -> "amd64";
+            _ -> "unknown"
+        end,
+
+TargetPostfix = TargetOS ++ "_" ++ TargetArch,
+
+%% Read in the original config
+Config = CONFIG,
+
+%% Update port_specs with the target name
+PortSpecs = proplists:get_value(port_specs, Config, []),
+NewPortSpecs = [{"priv/snappyer_" ++ TargetPostfix ++ ".so", Files} || {"priv/snappyer.so", Files} <- PortSpecs],
+
+%% Return the updated config
+lists:keystore(port_specs, 1, Config, {port_specs, NewPortSpecs}).
